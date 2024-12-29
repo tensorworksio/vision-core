@@ -26,6 +26,7 @@ This library serves as a foundation for vision applications, ensuring consistent
 - Dependencies:
   - nlohmann_json
   - spdlog (for logging utilities)
+  - opencv
 
 ## Integration
 Add as a subproject in your Meson project:
