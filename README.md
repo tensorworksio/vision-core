@@ -35,3 +35,9 @@ Add as a subproject in your Meson project:
 directory = vision-core
 url = https://github.com/tensorworksio/vision-core.git
 revision = main
+```
+
+## Test
+```shell
+meson test -C build -v --print-errorlogs
+```

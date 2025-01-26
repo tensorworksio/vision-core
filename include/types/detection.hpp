@@ -30,7 +30,7 @@ struct Detection
         return getColorById(id);
     }
 
-    static cv::Scalar getColorById(int id) const
+    static cv::Scalar getColorById(int id)
     {
         srand(id);
         return cv::Scalar(rand() % 256, rand() % 256, rand() % 256);

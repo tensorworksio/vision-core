@@ -11,6 +11,9 @@ project('vision-core', 'cpp',
 inc_dir = include_directories('include')
 
 # Core dependencies
+gtest_dep = dependency('gtest', required: true)
+gtest_main_dep = dependency('gtest_main', required: true)
+
 spdlog_dep = dependency('spdlog', required: true)
 json_dep = dependency('nlohmann_json', required: true)
 opencv_dep = dependency('opencv4', modules: ['core'], required: true)
@@ -24,3 +27,20 @@ vision_core_dep = declare_dependency(
         opencv_dep
     ]
 )
+
+# Test executables
+test_sources = [
+    'tests/detection_test.cpp',
+]
+
+test_exe = executable('vision_core_tests', 
+    test_sources,
+    include_directories: inc_dir,
+    dependencies: [
+        vision_core_dep,
+        gtest_dep,
+        gtest_main_dep
+    ]
+)
+
+test('vision_core_tests', test_exe)
