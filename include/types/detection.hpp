@@ -19,9 +19,20 @@ struct Detection
     // Reid specific
     std::vector<float> features{};
 
-    cv::Scalar getColor() const
+    // Display
+    cv::Scalar getClassColor() const
     {
-        srand(class_id);
+        return getColorById(class_id);
+    }
+
+    cv::Scalar getTrackColor() const
+    {
+        return getColorById(id);
+    }
+
+    static cv::Scalar getColorById(int id) const
+    {
+        srand(id);
         return cv::Scalar(rand() % 256, rand() % 256, rand() % 256);
     }
 
