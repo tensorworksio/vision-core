@@ -10,6 +10,7 @@ struct Detection
     float confidence;
     cv::Rect2f bbox;
     std::string class_name{};
+    cv::Mat mask{};
 
     // MOT specific
     int frame{-1};
