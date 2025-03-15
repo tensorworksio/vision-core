@@ -20,6 +20,9 @@ struct Detection
     // Reid specific
     std::vector<float> features{};
 
+    // Multi label placeholder
+    std::vector<int> labels{};
+
     // Display
     cv::Scalar getClassColor() const
     {
