@@ -15,6 +15,8 @@ struct Frame
     cv::Size size;
     TimePoint timestamp;
 
+    Frame() : image(), size(0, 0), timestamp(std::chrono::system_clock::now()) {}
+
     Frame(const cv::Mat &img, TimePoint ts = std::chrono::system_clock::now())
         : image(img), size(img.size()), timestamp(ts) {}
 
