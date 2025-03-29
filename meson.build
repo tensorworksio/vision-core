@@ -32,7 +32,8 @@ vision_core_dep = declare_dependency(
 test_sources = [
     'tests/detection_test.cpp',
     'tests/vector_utils_test.cpp',
-    'tests/geometry_utils_test.cpp'
+    'tests/geometry_utils_test.cpp',
+    'tests/detection_utils_test.cpp'
 ]
 
 test_exe = executable('vision_core_tests', 

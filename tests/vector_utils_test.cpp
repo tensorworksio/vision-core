@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <utils/vector_utils.hpp>
+#include <vector>
 
 class VectorUtilsTest : public testing::Test
 {
@@ -107,4 +108,78 @@ TEST_F(VectorUtilsTest, Slice)
     EXPECT_EQ(result.size(), 2);
     EXPECT_FLOAT_EQ(result[0], 1.0f);
     EXPECT_FLOAT_EQ(result[1], 2.0f);
+}
+
+TEST_F(VectorUtilsTest, SigmoidEmptyVector)
+{
+    auto result = vector_ops::sigmoid(empty);
+    EXPECT_TRUE(result.empty());
+}
+
+TEST_F(VectorUtilsTest, SigmoidSingleElement)
+{
+    std::vector<float> input{0.0f};
+    auto result = vector_ops::sigmoid(input);
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_NEAR(result[0], 0.5f, 1e-6);
+}
+
+TEST_F(VectorUtilsTest, SigmoidMultipleElements)
+{
+    std::vector<float> input{-2.0f, 0.0f, 2.0f};
+    auto result = vector_ops::sigmoid(input);
+    EXPECT_EQ(result.size(), 3);
+    EXPECT_NEAR(result[0], 0.119203f, 1e-6);
+    EXPECT_NEAR(result[1], 0.5f, 1e-6);
+    EXPECT_NEAR(result[2], 0.880797f, 1e-6);
+}
+
+TEST_F(VectorUtilsTest, SoftmaxEmptyVector)
+{
+    auto result = vector_ops::softmax(empty);
+    EXPECT_TRUE(result.empty());
+}
+
+TEST_F(VectorUtilsTest, SoftmaxSingleElement)
+{
+    std::vector<float> input{1.0f};
+    auto result = vector_ops::softmax(input);
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_NEAR(result[0], 1.0f, 1e-6);
+}
+
+TEST_F(VectorUtilsTest, SoftmaxMultipleElements)
+{
+    std::vector<float> input{1.0f, 2.0f, 3.0f};
+    auto result = vector_ops::softmax(input);
+    EXPECT_EQ(result.size(), 3);
+    EXPECT_NEAR(result[0], 0.090031f, 1e-6);
+    EXPECT_NEAR(result[1], 0.244728f, 1e-6);
+    EXPECT_NEAR(result[2], 0.665241f, 1e-6);
+}
+
+TEST_F(VectorUtilsTest, SoftmaxLargeNumbers)
+{
+    std::vector<float> input{100.0f, 100.0f, 100.0f};
+    auto result = vector_ops::softmax(input);
+    EXPECT_EQ(result.size(), 3);
+    for (const auto &val : result)
+    {
+        EXPECT_NEAR(val, 1.0f / 3.0f, 1e-6);
+    }
+}
+
+TEST_F(VectorUtilsTest, SoftmaxNegativeNumbers)
+{
+    std::vector<float> input{-1.0f, -2.0f, -3.0f};
+    auto result = vector_ops::softmax(input);
+    EXPECT_EQ(result.size(), 3);
+    EXPECT_NEAR(result[0], 0.665241f, 1e-6);
+    EXPECT_NEAR(result[1], 0.244728f, 1e-6);
+    EXPECT_NEAR(result[2], 0.090031f, 1e-6);
+}
+
+TEST_F(VectorUtilsTest, MaxEmptyVector)
+{
+    EXPECT_THROW(vector_ops::max(empty), std::invalid_argument);
 }

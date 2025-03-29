@@ -118,6 +118,10 @@ namespace vector_ops
     template <typename T>
     inline T max(const std::vector<T> &vec)
     {
+        if (vec.empty())
+        {
+            throw std::invalid_argument("Cannot find maximum of empty vector");
+        }
         return *std::max_element(vec.begin(), vec.end());
     }
 
@@ -139,6 +143,48 @@ namespace vector_ops
         auto last = vec.begin() + end;
         std::vector<T> sliced(first, last);
         return sliced;
+    }
+
+    // Sigmoid
+    template <typename T>
+    inline std::vector<T> sigmoid(const std::vector<T> &logits)
+    {
+        if (logits.empty())
+        {
+            return std::vector<T>();
+        }
+
+        std::vector<T> results(logits.size());
+        std::transform(logits.begin(), logits.end(), results.begin(),
+                       [](T x)
+                       {
+                           return T(1) / (T(1) + std::exp(-x));
+                       });
+        return results;
+    }
+
+    // Softmax
+    template <typename T>
+    inline std::vector<T> softmax(const std::vector<T> &logits)
+    {
+        if (logits.empty())
+        {
+            return std::vector<T>();
+        }
+
+        if (logits.size() == 1)
+        {
+            return std::vector<T>{T(1)};
+        }
+
+        std::vector<T> exp_values(logits.size());
+
+        // Subtract max_logit from all logits to avoid overflow in exponentiation
+        T max_logit = vector_ops::max(logits); // Now safe since we checked empty case
+        exp_values = vector_ops::exp(vector_ops::add(logits, -max_logit));
+        T sum_exp = vector_ops::sum(exp_values);
+
+        return vector_ops::mul(exp_values, T(1) / sum_exp);
     }
 
 } // namespace vector_ops
