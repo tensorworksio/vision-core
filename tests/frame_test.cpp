@@ -110,3 +110,14 @@ TEST_F(FrameTest, DrawEmptyDetectionsTest)
     cv::compare(gray1, gray2, diff, cv::CMP_NE);
     EXPECT_EQ(cv::countNonZero(diff), 0);
 }
+
+TEST_F(FrameTest, FrameIdTest)
+{
+    Frame::frame_counter = 0; // Reset counter for this test
+
+    Frame frame1;
+    Frame frame2(test_image);
+
+    EXPECT_EQ(frame1.getId(), 0);
+    EXPECT_EQ(frame2.getId(), 1);
+}

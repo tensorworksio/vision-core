@@ -4,11 +4,13 @@
 
 inline cv::Rect getAbsoluteBbox(const cv::Rect2f &rel_bbox, cv::Size size)
 {
-    return cv::Rect(
+    auto abs_bbox = cv::Rect(
         static_cast<int>(rel_bbox.x * size.width),
         static_cast<int>(rel_bbox.y * size.height),
         static_cast<int>(rel_bbox.width * size.width),
         static_cast<int>(rel_bbox.height * size.height));
+
+    return abs_bbox & cv::Rect(0, 0, size.width, size.height);
 }
 
 inline cv::Mat getAbsoluteMask(const cv::Mat &rel_mask, cv::Size size, float threshold = 0.5)

@@ -14,11 +14,14 @@ struct Frame
     cv::Mat image;
     cv::Size size;
     TimePoint timestamp;
+    uint64_t id;
 
-    Frame() : image(), size(0, 0), timestamp(std::chrono::system_clock::now()) {}
+    static uint64_t frame_counter;
+
+    Frame() : image(), size(0, 0), timestamp(std::chrono::system_clock::now()), id(frame_counter++) {}
 
     Frame(const cv::Mat &img, TimePoint ts = std::chrono::system_clock::now())
-        : image(img), size(img.size()), timestamp(ts) {}
+        : image(img), size(img.size()), timestamp(ts), id(frame_counter++) {}
 
     friend Frame &operator>>(cv::VideoCapture &cap, Frame &frame)
     {
@@ -29,6 +32,7 @@ struct Frame
             frame.image = img;
             frame.size = img.size();
             frame.timestamp = std::chrono::system_clock::now();
+            frame.id = frame_counter++;
         }
         return frame;
     }
@@ -46,6 +50,8 @@ struct Frame
 
     int width() const { return size.width; };
     int height() const { return size.height; };
+
+    uint64_t getId() const { return id; }
 
     cv::Mat draw(const std::vector<Detection> &detections, bool use_track_colors = false, bool draw_labels = true) const
     {
@@ -77,10 +83,6 @@ struct Frame
             {
                 // Construct label text
                 std::string label = det.class_name;
-                if (det.class_id >= 0)
-                {
-                    label = "(" + std::to_string(det.class_id) + ") " + label;
-                }
                 if (det.track_id >= 0)
                 {
                     label += " [" + std::to_string(det.track_id) + "]";
@@ -114,3 +116,5 @@ struct Frame
         return output;
     }
 };
+
+uint64_t Frame::frame_counter = 0;
