@@ -14,7 +14,7 @@ struct Detection
 
     // MOT specific
     int frame{-1};
-    int id{-1};
+    int track_id{-1};
     cv::Point3f position{0.0f, 0.0f, 0.0f};
 
     // Reid specific
@@ -31,7 +31,7 @@ struct Detection
 
     cv::Scalar getTrackColor() const
     {
-        return getColorById(id);
+        return getColorById(track_id);
     }
 
     static cv::Scalar getColorById(int id)
@@ -49,7 +49,7 @@ struct Detection
         detection.frame = std::stoi(field);
 
         std::getline(is, field, ',');
-        detection.id = std::stoi(field);
+        detection.track_id = std::stoi(field);
 
         std::getline(is, field, ',');
         detection.bbox.x = std::stof(field);
@@ -80,7 +80,7 @@ struct Detection
 
     friend std::ostream &operator<<(std::ostream &os, const Detection &detection)
     {
-        os << detection.frame << "," << detection.id << ","
+        os << detection.frame << "," << detection.track_id << ","
            << detection.bbox.x << "," << detection.bbox.y << ","
            << detection.bbox.width << "," << detection.bbox.height << ","
            << detection.confidence << ","

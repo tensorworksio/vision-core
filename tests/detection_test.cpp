@@ -5,7 +5,7 @@ TEST(DetectionTest, DefaultConstructor)
 {
     Detection det;
     EXPECT_EQ(det.class_id, -1);
-    EXPECT_EQ(det.id, -1);
+    EXPECT_EQ(det.track_id, -1);
     EXPECT_EQ(det.frame, -1);
     EXPECT_TRUE(det.class_name.empty());
 }
@@ -13,10 +13,10 @@ TEST(DetectionTest, DefaultConstructor)
 TEST(DetectionTest, ColorGeneration)
 {
     Detection det1, det2;
-    det1.id = 1;
+    det1.track_id = 1;
     det1.class_id = 1;
 
-    det2.id = 2;
+    det2.track_id = 2;
     det2.class_id = 1;
 
     EXPECT_EQ(det1.getClassColor(), det2.getClassColor());
@@ -30,7 +30,7 @@ TEST(DetectionTest, StreamOperator)
     ss >> det;
 
     EXPECT_EQ(det.frame, 1);
-    EXPECT_EQ(det.id, 2);
+    EXPECT_EQ(det.track_id, 2);
     EXPECT_FLOAT_EQ(det.bbox.x, 10.0f);
     EXPECT_FLOAT_EQ(det.bbox.y, 20.0f);
     EXPECT_FLOAT_EQ(det.bbox.width, 30.0f);

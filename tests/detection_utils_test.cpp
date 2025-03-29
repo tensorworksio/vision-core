@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <utils/detection_utils.hpp>
-#include <types/detection.hpp>
 #include <opencv2/opencv.hpp>
 
 class DetectionUtilsTest : public ::testing::Test
@@ -8,24 +7,23 @@ class DetectionUtilsTest : public ::testing::Test
 protected:
     void SetUp() override
     {
-        // Create a sample detection with normalized coordinates
-        det.bbox = {0.25, 0.25, 0.5, 0.5}; // x, y, width, height
-        det.confidence = 0.95;
-        det.class_id = 1;
+        // Create sample relative coordinates
+        rel_bbox = cv::Rect2f(0.25f, 0.25f, 0.5f, 0.5f); // x, y, width, height
 
         // Create a sample mask (3x3 matrix)
-        det.mask = (cv::Mat_<float>(3, 3) << 0.1, 0.6, 0.1,
+        rel_mask = (cv::Mat_<float>(3, 3) << 0.1, 0.6, 0.1,
                     0.6, 0.9, 0.6,
                     0.1, 0.6, 0.1);
     }
 
-    Detection det;
+    cv::Rect2f rel_bbox;
+    cv::Mat rel_mask;
 };
 
 TEST_F(DetectionUtilsTest, GetAbsoluteBboxTest)
 {
     cv::Size size(400, 300);
-    cv::Rect abs_bbox = getAbsoluteBbox(det, size);
+    cv::Rect abs_bbox = getAbsoluteBbox(rel_bbox, size);
 
     EXPECT_EQ(abs_bbox.x, 100);      // 0.25 * 400
     EXPECT_EQ(abs_bbox.y, 75);       // 0.25 * 300
@@ -38,28 +36,28 @@ TEST_F(DetectionUtilsTest, GetAbsoluteMaskTest)
     cv::Size size(4, 4);
     float threshold = 0.5;
 
-    cv::Mat abs_mask = getAbsoluteMask(det, size, threshold);
+    cv::Mat abs_mask = getAbsoluteMask(rel_mask, size, threshold);
 
     EXPECT_EQ(abs_mask.size(), size);
-    EXPECT_EQ(abs_mask.type(), CV_32F);
+    EXPECT_EQ(abs_mask.type(), CV_8U);
 
     // Check that thresholding worked (values should be 0 or 1)
     for (int i = 0; i < abs_mask.rows; i++)
     {
         for (int j = 0; j < abs_mask.cols; j++)
         {
-            float val = abs_mask.at<float>(i, j);
-            EXPECT_TRUE(val == 0.0f || val == 1.0f);
+            uchar val = abs_mask.at<uchar>(i, j);
+            EXPECT_TRUE(val == 0 || val == 1);
         }
     }
 }
 
 TEST_F(DetectionUtilsTest, GetAbsoluteMaskEmptyTest)
 {
-    Detection empty_det;
+    cv::Mat empty_mask;
     cv::Size size(4, 4);
 
-    cv::Mat abs_mask = getAbsoluteMask(empty_det, size);
+    cv::Mat abs_mask = getAbsoluteMask(empty_mask, size);
 
     EXPECT_TRUE(abs_mask.empty());
 }

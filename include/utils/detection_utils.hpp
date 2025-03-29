@@ -1,25 +1,25 @@
 #pragma once
 
 #include <opencv2/opencv.hpp>
-#include <types/detection.hpp>
 
-inline cv::Rect getAbsoluteBbox(const Detection &det, cv::Size size)
+inline cv::Rect getAbsoluteBbox(const cv::Rect2f &rel_bbox, cv::Size size)
 {
     return cv::Rect(
-        static_cast<int>(det.bbox.x * size.width),
-        static_cast<int>(det.bbox.y * size.height),
-        static_cast<int>(det.bbox.width * size.width),
-        static_cast<int>(det.bbox.height * size.height));
+        static_cast<int>(rel_bbox.x * size.width),
+        static_cast<int>(rel_bbox.y * size.height),
+        static_cast<int>(rel_bbox.width * size.width),
+        static_cast<int>(rel_bbox.height * size.height));
 }
 
-inline cv::Mat getAbsoluteMask(const Detection &det, cv::Size size, float threshold = 0.5)
+inline cv::Mat getAbsoluteMask(const cv::Mat &rel_mask, cv::Size size, float threshold = 0.5)
 {
-    if (det.mask.empty())
+    if (rel_mask.empty())
         return cv::Mat();
 
     cv::Mat resized_mask, binary_mask;
-    cv::resize(det.mask, resized_mask, size, cv::INTER_LINEAR);
+    cv::resize(rel_mask, resized_mask, size, cv::INTER_LINEAR);
     cv::threshold(resized_mask, binary_mask, threshold, 1.0, cv::THRESH_BINARY);
+    binary_mask.convertTo(binary_mask, CV_8U); // Convert to 8-bit unsigned
     return binary_mask;
 }
 
