@@ -13,8 +13,8 @@ struct Detection
     cv::Mat mask{};
 
     // MOT specific
-    int frame{-1};
-    int track_id{-1};
+    int64_t frame_id{-1};
+    int64_t track_id{-1};
     cv::Point3f position{0.0f, 0.0f, 0.0f};
 
     // Reid specific
@@ -46,7 +46,7 @@ struct Detection
         std::string field;
 
         std::getline(is, field, ',');
-        detection.frame = std::stoi(field);
+        detection.frame_id = std::stoi(field);
 
         std::getline(is, field, ',');
         detection.track_id = std::stoi(field);
@@ -80,7 +80,7 @@ struct Detection
 
     friend std::ostream &operator<<(std::ostream &os, const Detection &detection)
     {
-        os << detection.frame << "," << detection.track_id << ","
+        os << detection.frame_id << "," << detection.track_id << ","
            << detection.bbox.x << "," << detection.bbox.y << ","
            << detection.bbox.width << "," << detection.bbox.height << ","
            << detection.confidence << ","

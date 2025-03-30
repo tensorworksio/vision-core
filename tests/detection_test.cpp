@@ -6,7 +6,7 @@ TEST(DetectionTest, DefaultConstructor)
     Detection det;
     EXPECT_EQ(det.class_id, -1);
     EXPECT_EQ(det.track_id, -1);
-    EXPECT_EQ(det.frame, -1);
+    EXPECT_EQ(det.frame_id, -1);
     EXPECT_TRUE(det.class_name.empty());
 }
 
@@ -29,7 +29,7 @@ TEST(DetectionTest, StreamOperator)
     Detection det;
     ss >> det;
 
-    EXPECT_EQ(det.frame, 1);
+    EXPECT_EQ(det.frame_id, 1);
     EXPECT_EQ(det.track_id, 2);
     EXPECT_FLOAT_EQ(det.bbox.x, 10.0f);
     EXPECT_FLOAT_EQ(det.bbox.y, 20.0f);

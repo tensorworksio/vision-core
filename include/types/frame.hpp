@@ -14,9 +14,9 @@ struct Frame
     cv::Mat image;
     cv::Size size;
     TimePoint timestamp;
-    uint64_t id;
+    int64_t id;
 
-    static uint64_t frame_counter;
+    static int64_t frame_counter;
 
     Frame() : image(), size(0, 0), timestamp(std::chrono::system_clock::now()), id(frame_counter++) {}
 
@@ -51,7 +51,7 @@ struct Frame
     int width() const { return size.width; };
     int height() const { return size.height; };
 
-    uint64_t getId() const { return id; }
+    int64_t getId() const { return id; }
 
     cv::Mat draw(const std::vector<Detection> &detections, bool use_track_colors = false, bool draw_labels = true) const
     {
@@ -117,4 +117,4 @@ struct Frame
     }
 };
 
-uint64_t Frame::frame_counter = 0;
+int64_t Frame::frame_counter = 0;
