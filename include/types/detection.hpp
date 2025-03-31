@@ -8,8 +8,8 @@
 struct Detection
 {
     int class_id{-1};
-    float confidence;
-    cv::Rect2f bbox;
+    float confidence{0.f};
+    cv::Rect2f bbox{};
     std::string class_name{};
     cv::Mat mask{};
 
