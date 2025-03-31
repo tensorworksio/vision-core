@@ -20,8 +20,7 @@ struct Detection
     // Reid specific
     std::vector<float> features{};
 
-    // Multi label placeholder
-    std::vector<int> labels{};
+    cv::Size size; // set for absolute bbox
 
     // Display
     cv::Scalar getClassColor() const
@@ -74,6 +73,8 @@ struct Detection
 
         std::getline(is, field);
         detection.position.z = std::stof(field);
+
+        detection.size = cv::Size(detection.bbox.width, detection.bbox.height);
 
         return is;
     }

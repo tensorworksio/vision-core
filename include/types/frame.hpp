@@ -64,7 +64,7 @@ struct Frame
             cv::Scalar color = use_track_colors ? det.getTrackColor() : det.getClassColor();
 
             // Convert relative coordinates to absolute
-            cv::Rect abs_bbox = getAbsoluteBbox(det.bbox, size);
+            cv::Rect abs_bbox = det.size.empty() ? getAbsoluteBbox(det.bbox, size) : cv::Rect(det.bbox);
             cv::Mat abs_mask = getAbsoluteMask(det.mask, abs_bbox.size());
 
             // Draw mask if available
