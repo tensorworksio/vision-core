@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <vector>
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -20,9 +21,12 @@ struct Detection
     // Reid specific
     std::vector<float> features{};
 
-    cv::Size size; // set for absolute bbox
+    // Multi-label classification
+    std::map<int, std::string> labels{};
 
     // Display
+    cv::Size size{}; // set for absolute bbox
+
     cv::Scalar getClassColor() const
     {
         return getColorById(class_id);
