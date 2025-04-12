@@ -121,3 +121,39 @@ TEST_F(FrameTest, FrameIdTest)
     EXPECT_EQ(frame1.getId(), 0);
     EXPECT_EQ(frame2.getId(), 1);
 }
+
+TEST_F(FrameTest, ROIOperatorAbsolute)
+{
+    Frame frame(test_image);
+
+    // Test valid ROI
+    cv::Rect roi(25, 25, 50, 50);
+    cv::Mat roi_result = frame(roi);
+    EXPECT_EQ(roi_result.cols, roi.width);
+    EXPECT_EQ(roi_result.rows, roi.height);
+
+    // Test ROI that exceeds image boundaries
+    cv::Rect oversized_roi(75, 75, 50, 50);
+    cv::Mat safe_roi = frame(oversized_roi);
+    EXPECT_LE(safe_roi.cols + oversized_roi.x, frame.width());
+    EXPECT_LE(safe_roi.rows + oversized_roi.y, frame.height());
+}
+
+TEST_F(FrameTest, ROIOperatorRelative)
+{
+    Frame frame(test_image);
+
+    // Test valid relative ROI
+    cv::Rect2f rel_roi(0.25f, 0.25f, 0.5f, 0.5f);
+    cv::Mat roi_result = frame(rel_roi);
+
+    // Expected size should be half of the original dimensions
+    EXPECT_EQ(roi_result.cols, frame.width() / 2);
+    EXPECT_EQ(roi_result.rows, frame.height() / 2);
+
+    // Test relative ROI that exceeds image boundaries
+    cv::Rect2f oversized_rel_roi(0.8f, 0.8f, 0.3f, 0.3f);
+    cv::Mat safe_roi = frame(oversized_rel_roi);
+    EXPECT_GT(safe_roi.cols, 0);
+    EXPECT_GT(safe_roi.rows, 0);
+}

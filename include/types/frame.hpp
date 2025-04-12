@@ -37,6 +37,18 @@ struct Frame
         return frame;
     }
 
+    cv::Mat operator()(const cv::Rect &rect) const
+    {
+        cv::Rect safe_rect = rect & cv::Rect(0, 0, width(), height());
+        return image(safe_rect);
+    }
+
+    cv::Mat operator()(const cv::Rect2f &rel_rect) const
+    {
+        cv::Rect safe_rect = getAbsoluteBbox(rel_rect, size);
+        return image(safe_rect);
+    }
+
     bool empty() const { return image.empty(); }
 
     TimePoint getTimestamp() const { return timestamp; }
