@@ -183,3 +183,27 @@ TEST_F(VectorUtilsTest, MaxEmptyVector)
 {
     EXPECT_THROW(vector_ops::max(empty), std::invalid_argument);
 }
+
+TEST_F(VectorUtilsTest, ArgmaxEmptyVector)
+{
+    EXPECT_THROW(vector_ops::argmax(empty), std::invalid_argument);
+}
+
+TEST_F(VectorUtilsTest, ArgmaxSingleElement)
+{
+    std::vector<float> input{1.0f};
+    EXPECT_EQ(vector_ops::argmax(input), 0);
+}
+
+TEST_F(VectorUtilsTest, ArgmaxMultipleElements)
+{
+    std::vector<float> input{1.0f, 3.0f, 2.0f, 3.0f};
+    // Should return index of first maximum value
+    EXPECT_EQ(vector_ops::argmax(input), 1);
+}
+
+TEST_F(VectorUtilsTest, ArgmaxNegativeNumbers)
+{
+    std::vector<float> input{-4.0f, -1.0f, -3.0f, -2.0f};
+    EXPECT_EQ(vector_ops::argmax(input), 1);
+}

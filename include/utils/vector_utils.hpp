@@ -125,6 +125,16 @@ namespace vector_ops
         return *std::max_element(vec.begin(), vec.end());
     }
 
+    template <typename T>
+    inline size_t argmax(const std::vector<T> &vec)
+    {
+        if (vec.empty())
+        {
+            throw std::invalid_argument("Cannot find maximum of empty vector");
+        }
+        return std::distance(vec.begin(), std::max_element(vec.begin(), vec.end()));
+    }
+
     // Exp vector
     template <typename T>
     inline std::vector<T> exp(const std::vector<T> &vec)
