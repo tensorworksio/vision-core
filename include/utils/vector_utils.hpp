@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <vector>
-#include <numeric>
+#include <ranges>
 #include <stdexcept>
 #include <algorithm>
 #include <functional>
@@ -20,7 +20,7 @@ namespace vector_ops
         }
 
         std::vector<T> result(a.size());
-        std::transform(a.begin(), a.end(), b.begin(), result.begin(), std::plus<>());
+        std::ranges::transform(a, b, result.begin(), std::plus<>{});
         return result;
     }
 
@@ -29,7 +29,7 @@ namespace vector_ops
     inline std::vector<T> add(const std::vector<T> &vec, T scalar)
     {
         std::vector<T> result(vec.size());
-        std::transform(vec.begin(), vec.end(), result.begin(), [scalar](T x)
+        std::ranges::transform(vec, result.begin(), [scalar](T x)
                        { return x + scalar; });
         return result;
     }
@@ -44,7 +44,7 @@ namespace vector_ops
         }
 
         std::vector<T> result(a.size());
-        std::transform(a.begin(), a.end(), b.begin(), result.begin(), std::multiplies<>());
+        std::ranges::transform(a, b, result.begin(), std::multiplies<>{});
         return result;
     }
 
@@ -53,7 +53,7 @@ namespace vector_ops
     inline std::vector<T> mul(const std::vector<T> &vec, T scalar)
     {
         std::vector<T> result(vec.size());
-        std::transform(vec.begin(), vec.end(), result.begin(), [scalar](T x)
+        std::ranges::transform(vec, result.begin(), [scalar](T x)
                        { return x * scalar; });
         return result;
     }
@@ -67,7 +67,9 @@ namespace vector_ops
             throw std::invalid_argument("Vectors must be the same size");
         }
 
-        return std::inner_product(a.begin(), a.end(), b.begin(), T(0));
+        return std::ranges::fold_left(
+            std::views::zip_transform(std::multiplies<>{}, a, b),
+            T(0), std::plus<>{});
     }
 
     // Normalize vector
@@ -90,7 +92,7 @@ namespace vector_ops
         }
         const T alpha_complement = T(1) - alpha;
         std::vector<T> result(a.size());
-        std::transform(a.begin(), a.end(), b.begin(), result.begin(), [alpha, alpha_complement](T x, T y)
+        std::ranges::transform(a, b, result.begin(), [alpha, alpha_complement](T x, T y)
                        { return alpha * x + alpha_complement * y; });
         return result;
     }
@@ -99,7 +101,7 @@ namespace vector_ops
     template <typename T>
     inline T sum(const std::vector<T> &vec)
     {
-        return std::accumulate(vec.begin(), vec.end(), T(0));
+        return std::ranges::fold_left(vec, T(0), std::plus<>{});
     }
 
     // Mean vector
@@ -122,7 +124,7 @@ namespace vector_ops
         {
             throw std::invalid_argument("Cannot find maximum of empty vector");
         }
-        return *std::max_element(vec.begin(), vec.end());
+        return std::ranges::max(vec);
     }
 
     template <typename T>
@@ -132,7 +134,7 @@ namespace vector_ops
         {
             throw std::invalid_argument("Cannot find maximum of empty vector");
         }
-        return std::distance(vec.begin(), std::max_element(vec.begin(), vec.end()));
+        return static_cast<size_t>(std::ranges::max_element(vec) - vec.begin());
     }
 
     // Exp vector
@@ -140,7 +142,7 @@ namespace vector_ops
     inline std::vector<T> exp(const std::vector<T> &vec)
     {
         std::vector<T> result(vec.size());
-        std::transform(vec.begin(), vec.end(), result.begin(), [](T x)
+        std::ranges::transform(vec, result.begin(), [](T x)
                        { return std::exp(x); });
         return result;
     }
@@ -165,7 +167,7 @@ namespace vector_ops
         }
 
         std::vector<T> results(logits.size());
-        std::transform(logits.begin(), logits.end(), results.begin(),
+        std::ranges::transform(logits, results.begin(),
                        [](T x)
                        {
                            return T(1) / (T(1) + std::exp(-x));
@@ -187,11 +189,8 @@ namespace vector_ops
             return std::vector<T>{T(1)};
         }
 
-        std::vector<T> exp_values(logits.size());
-
-        // Subtract max_logit from all logits to avoid overflow in exponentiation
-        T max_logit = vector_ops::max(logits); // Now safe since we checked empty case
-        exp_values = vector_ops::exp(vector_ops::add(logits, -max_logit));
+        T max_logit = vector_ops::max(logits);
+        std::vector<T> exp_values = vector_ops::exp(vector_ops::add(logits, -max_logit));
         T sum_exp = vector_ops::sum(exp_values);
 
         return vector_ops::mul(exp_values, T(1) / sum_exp);

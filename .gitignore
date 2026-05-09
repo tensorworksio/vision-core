@@ -5,3 +5,6 @@
 build
 builddir
 data
+
+subprojects/*
+!subprojects/*.wrap
