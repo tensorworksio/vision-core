@@ -1,7 +1,7 @@
 project('vision-core', 'cpp',
     version: '0.1.0',
     default_options: [
-        'cpp_std=c++17',
+        'cpp_std=c++23',
         'warning_level=3',
         'werror=true'
     ]
@@ -16,7 +16,7 @@ gtest_main_dep = dependency('gtest_main', required: true)
 
 spdlog_dep = dependency('spdlog', required: true)
 json_dep = dependency('nlohmann_json', required: true)
-opencv_dep = dependency('opencv4', modules: ['core'], required: true)
+opencv_dep = dependency('opencv4', modules: ['core'], required: true, include_type: 'system')
 
 # Header-only library dependency that will be exported
 vision_core_dep = declare_dependency(
@@ -34,7 +34,8 @@ test_sources = [
     'tests/detection_test.cpp',
     'tests/vector_utils_test.cpp',
     'tests/geometry_utils_test.cpp',
-    'tests/detection_utils_test.cpp'
+    'tests/detection_utils_test.cpp',
+    'tests/transform_utils_test.cpp'
 ]
 
 test_exe = executable('vision_core_tests', 

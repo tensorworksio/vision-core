@@ -18,7 +18,6 @@ inline float getIoU(const cv::Rect2f &rect1, const cv::Rect2f &rect2)
 
 inline float cosineSimilarity(const std::vector<float> &vec1, const std::vector<float> &vec2)
 {
-    float similarity;
     float dotProduct = vector_ops::dot(vec1, vec2);
     float normVec1 = std::sqrt(vector_ops::dot(vec1, vec1));
     float normVec2 = std::sqrt(vector_ops::dot(vec2, vec2));
@@ -28,6 +27,5 @@ inline float cosineSimilarity(const std::vector<float> &vec1, const std::vector<
         return 0.f;
     }
 
-    similarity = (1.f + dotProduct / (normVec1 * normVec2)) / 2.f;
-    return similarity;
+    return (1.f + dotProduct / (normVec1 * normVec2)) / 2.f;
 }
