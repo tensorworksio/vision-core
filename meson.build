@@ -18,13 +18,21 @@ spdlog_dep = dependency('spdlog', required: true)
 json_dep = dependency('nlohmann_json', required: true)
 opencv_dep = dependency('opencv4', modules: ['core'], required: true, include_type: 'system')
 
+# Subprojects
+reflect_proj = subproject('reflect-cpp', required: true)
+if not reflect_proj.found()
+    error('reflect-cpp subproject not found. Please make sure it exists in subprojects directory.')
+endif
+reflect_dep = reflect_proj.get_variable('reflect_dep')
+
 # Header-only library dependency that will be exported
 vision_core_dep = declare_dependency(
     include_directories: inc_dir,
     dependencies: [
         spdlog_dep,
         json_dep,
-        opencv_dep
+        opencv_dep,
+        reflect_dep
     ]
 )
 

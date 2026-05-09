@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <utils/reflect_utils.hpp>
 
 struct Detection
 {
@@ -91,5 +92,43 @@ struct Detection
            << detection.confidence << ","
            << detection.position.x << "," << detection.position.y << "," << detection.position.z;
         return os;
+    }
+};
+
+template <>
+struct rfl::Reflector<Detection>
+{
+    struct ReflType
+    {
+        int class_id{-1};
+        float confidence{0.f};
+        cv::Rect2f bbox{};
+        std::string class_name{};
+        int64_t frame_id{-1};
+        int64_t track_id{-1};
+        cv::Point3f position{};
+        std::vector<float> features{};
+        std::map<int, std::string> labels{};
+    };
+
+    static ReflType from(const Detection &d) noexcept
+    {
+        return {d.class_id, d.confidence, d.bbox, d.class_name,
+                d.frame_id, d.track_id, d.position, d.features, d.labels};
+    }
+
+    static Detection to(const ReflType &r) noexcept
+    {
+        Detection d;
+        d.class_id = r.class_id;
+        d.confidence = r.confidence;
+        d.bbox = r.bbox;
+        d.class_name = r.class_name;
+        d.frame_id = r.frame_id;
+        d.track_id = r.track_id;
+        d.position = r.position;
+        d.features = r.features;
+        d.labels = r.labels;
+        return d;
     }
 };

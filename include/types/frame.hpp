@@ -15,6 +15,7 @@ struct Frame
     cv::Size size;
     TimePoint timestamp;
     int64_t id;
+    std::vector<Detection> detections;
 
     static int64_t frame_counter;
 
@@ -65,12 +66,12 @@ struct Frame
 
     int64_t getId() const { return id; }
 
-    cv::Mat draw(const std::vector<Detection> &detections, bool use_track_colors = false, bool draw_labels = true) const
+    cv::Mat draw(const std::vector<Detection> &dets, bool use_track_colors = false, bool draw_labels = true) const
     {
         cv::Mat output = image.clone();
         cv::Mat mask_overlay = cv::Mat::zeros(size, CV_8UC3);
 
-        for (const auto &det : detections)
+        for (const auto &det : dets)
         {
             // Get appropriate color based on user preference
             cv::Scalar color = use_track_colors ? det.getTrackColor() : det.getClassColor();
@@ -130,3 +131,30 @@ struct Frame
 };
 
 int64_t Frame::frame_counter = 0;
+
+template <>
+struct rfl::Reflector<Frame>
+{
+    struct ReflType
+    {
+        int64_t id{0};
+        std::chrono::system_clock::time_point timestamp{};
+        cv::Size size{};
+        std::vector<Detection> detections{};
+    };
+
+    static ReflType from(const Frame &f) noexcept
+    {
+        return {f.id, f.timestamp, f.size, f.detections};
+    }
+
+    static Frame to(const ReflType &r) noexcept
+    {
+        Frame f;
+        f.id = r.id;
+        f.timestamp = r.timestamp;
+        f.size = r.size;
+        f.detections = r.detections;
+        return f;
+    }
+};

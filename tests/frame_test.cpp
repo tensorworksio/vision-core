@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <types/frame.hpp>
 #include <types/detection.hpp>
+#include <rfl/json.hpp>
 
 class FrameTest : public ::testing::Test
 {
@@ -156,4 +157,116 @@ TEST_F(FrameTest, ROIOperatorRelative)
     cv::Mat safe_roi = frame(oversized_rel_roi);
     EXPECT_GT(safe_roi.cols, 0);
     EXPECT_GT(safe_roi.rows, 0);
+}
+
+TEST_F(FrameTest, DetectionsDefaultEmpty)
+{
+    Frame f;
+    EXPECT_TRUE(f.detections.empty());
+}
+
+TEST_F(FrameTest, DetectionsCanBeAdded)
+{
+    frame.detections = detections;
+    ASSERT_EQ(frame.detections.size(), 1u);
+    EXPECT_EQ(frame.detections[0].class_id, 1);
+    EXPECT_FLOAT_EQ(frame.detections[0].confidence, 0.95f);
+    EXPECT_EQ(frame.detections[0].class_name, "test_class");
+}
+
+TEST_F(FrameTest, DetectionSerializationRoundtrip)
+{
+    const Detection& det = detections[0];
+    const auto json_str = rfl::json::write(det);
+    EXPECT_FALSE(json_str.empty());
+
+    const auto result = rfl::json::read<Detection>(json_str);
+    ASSERT_TRUE(result.has_value());
+    const Detection& det2 = result.value();
+
+    EXPECT_EQ(det2.class_id, det.class_id);
+    EXPECT_FLOAT_EQ(det2.confidence, det.confidence);
+    EXPECT_EQ(det2.class_name, det.class_name);
+    EXPECT_EQ(det2.track_id, det.track_id);
+    EXPECT_FLOAT_EQ(det2.bbox.x, det.bbox.x);
+    EXPECT_FLOAT_EQ(det2.bbox.y, det.bbox.y);
+    EXPECT_FLOAT_EQ(det2.bbox.width, det.bbox.width);
+    EXPECT_FLOAT_EQ(det2.bbox.height, det.bbox.height);
+}
+
+TEST_F(FrameTest, FrameSerializationRoundtrip)
+{
+    Frame f;
+    f.id = 42;
+    f.detections = detections;
+
+    const auto json_str = rfl::json::write(f);
+    EXPECT_FALSE(json_str.empty());
+    EXPECT_NE(json_str.find("detections"), std::string::npos);
+
+    const auto result = rfl::json::read<Frame>(json_str);
+    ASSERT_TRUE(result.has_value());
+    const Frame& f2 = result.value();
+
+    EXPECT_EQ(f2.id, 42);
+    ASSERT_EQ(f2.detections.size(), 1u);
+    EXPECT_EQ(f2.detections[0].class_id, 1);
+    EXPECT_FLOAT_EQ(f2.detections[0].confidence, 0.95f);
+    EXPECT_EQ(f2.detections[0].class_name, "test_class");
+    EXPECT_EQ(f2.detections[0].track_id, 42);
+}
+
+TEST_F(FrameTest, FrameTimestampSerializationRoundtrip)
+{
+    Frame f;
+    auto now = std::chrono::system_clock::now();
+    // Truncate to millisecond precision to match serialization
+    now = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+    f.timestamp = now;
+
+    const auto json_str = rfl::json::write(f);
+    const auto result = rfl::json::read<Frame>(json_str);
+    ASSERT_TRUE(result.has_value());
+
+    EXPECT_EQ(result.value().getTimestampMs(), f.getTimestampMs());
+}
+
+TEST_F(FrameTest, FrameSizeSerializationRoundtrip)
+{
+    const auto json_str = rfl::json::write(frame);
+    const auto result = rfl::json::read<Frame>(json_str);
+    ASSERT_TRUE(result.has_value());
+
+    EXPECT_EQ(result.value().width(), frame.width());
+    EXPECT_EQ(result.value().height(), frame.height());
+}
+
+TEST_F(FrameTest, DetectionLabelsSerializationRoundtrip)
+{
+    Detection det;
+    det.class_id = 0;
+    det.class_name = "multi";
+    det.labels = {{0, "cat"}, {1, "animal"}};
+
+    const auto json_str = rfl::json::write(det);
+    const auto result = rfl::json::read<Detection>(json_str);
+    ASSERT_TRUE(result.has_value());
+
+    EXPECT_EQ(result.value().labels.size(), 2u);
+    EXPECT_EQ(result.value().labels.at(0), "cat");
+    EXPECT_EQ(result.value().labels.at(1), "animal");
+}
+
+TEST_F(FrameTest, DetectionFeaturesSerializationRoundtrip)
+{
+    Detection det;
+    det.features = {0.1f, 0.2f, 0.3f};
+
+    const auto json_str = rfl::json::write(det);
+    const auto result = rfl::json::read<Detection>(json_str);
+    ASSERT_TRUE(result.has_value());
+
+    ASSERT_EQ(result.value().features.size(), 3u);
+    EXPECT_FLOAT_EQ(result.value().features[0], 0.1f);
+    EXPECT_FLOAT_EQ(result.value().features[2], 0.3f);
 }
