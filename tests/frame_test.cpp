@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <types/frame.hpp>
 #include <types/detection.hpp>
+#include <utils/draw_utils.hpp>
 #include <rfl/json.hpp>
 
 class FrameTest : public ::testing::Test
@@ -56,7 +57,7 @@ TEST_F(FrameTest, TimestampTest)
 TEST_F(FrameTest, DrawTest)
 {
     // Test drawing with class colors
-    cv::Mat result = frame.draw(detections, false, true);
+    cv::Mat result = drawDetections(frame, detections, false, true);
 
     EXPECT_EQ(result.size(), frame.size);
     EXPECT_EQ(result.type(), CV_8UC3);
@@ -76,7 +77,7 @@ TEST_F(FrameTest, DrawTest)
 TEST_F(FrameTest, DrawWithTrackColorsTest)
 {
     // Test drawing with track colors
-    cv::Mat result = frame.draw(detections, true, true);
+    cv::Mat result = drawDetections(frame, detections, true, true);
 
     EXPECT_EQ(result.size(), frame.size);
     EXPECT_EQ(result.type(), CV_8UC3);
@@ -86,7 +87,7 @@ TEST_F(FrameTest, DrawWithTrackColorsTest)
 TEST_F(FrameTest, DrawWithoutLabelsTest)
 {
     // Test drawing without labels
-    cv::Mat result = frame.draw(detections, false, false);
+    cv::Mat result = drawDetections(frame, detections, false, false);
 
     EXPECT_EQ(result.size(), frame.size);
     EXPECT_EQ(result.type(), CV_8UC3);
@@ -96,7 +97,7 @@ TEST_F(FrameTest, DrawWithoutLabelsTest)
 TEST_F(FrameTest, DrawEmptyDetectionsTest)
 {
     std::vector<Detection> empty_detections;
-    cv::Mat result = frame.draw(empty_detections);
+    cv::Mat result = drawDetections(frame, empty_detections);
 
     EXPECT_EQ(result.size(), frame.size);
     EXPECT_EQ(result.type(), CV_8UC3);
