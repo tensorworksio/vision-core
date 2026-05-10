@@ -14,8 +14,6 @@ inc_dir = include_directories('include')
 gtest_dep = dependency('gtest', required: true)
 gtest_main_dep = dependency('gtest_main', required: true)
 
-spdlog_dep = dependency('spdlog', required: true)
-json_dep = dependency('nlohmann_json', required: true)
 opencv_dep = dependency('opencv4', modules: ['core'], required: true, include_type: 'system')
 
 # Subprojects
@@ -29,8 +27,6 @@ reflect_dep = reflect_proj.get_variable('reflect_dep')
 vision_core_dep = declare_dependency(
     include_directories: inc_dir,
     dependencies: [
-        spdlog_dep,
-        json_dep,
         opencv_dep,
         reflect_dep
     ]
