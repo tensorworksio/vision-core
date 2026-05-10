@@ -17,7 +17,7 @@ gtest_main_dep = dependency('gtest_main', required: true)
 opencv_dep = dependency('opencv4', modules: ['core'], required: true, include_type: 'system')
 
 # Subprojects
-reflect_proj = subproject('reflect-cpp', required: true)
+reflect_proj = subproject('reflect-cpp', required: true, default_options: ['toml=enabled'])
 if not reflect_proj.found()
     error('reflect-cpp subproject not found. Please make sure it exists in subprojects directory.')
 endif
